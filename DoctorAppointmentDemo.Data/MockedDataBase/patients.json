@@ -1,0 +1,14 @@
+[
+  {
+    "IllnessType": 0,
+    "AdditionalInfo": null,
+    "Address": null,
+    "Name": "Jon",
+    "Surname": "Snow",
+    "Phone": null,
+    "Email": null,
+    "Id": 1,
+    "CreatedAt": "2025-03-29T21:11:00.8051432+02:00",
+    "UpdatedAt": "0001-01-01T00:00:00"
+  }
+]

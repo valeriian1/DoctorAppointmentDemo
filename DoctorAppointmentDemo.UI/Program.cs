@@ -1,16 +1,18 @@
-﻿using System;
-using MyDoctorAppointment.Domain.Entities;
-using MyDoctorAppointment.Service.Interfaces;
-using MyDoctorAppointment.Service.Services;
+﻿using DoctorAppointmentDemo.Data.Interfaces;
+using DoctorAppointmentDemo.Domain.Entities;
+using DoctorAppointmentDemo.Service.Interfaces;
+using DoctorAppointmentDemo.Service.Services;
+namespace DoctorAppointmentDemo.Data.Configuration;
 
-namespace MyDoctorAppointment
-{
+
     public class DoctorAppointment
     {
+        private readonly string _appSettings;
+        private static DoctorAppointment? doctorAppointment;
         private readonly IDoctorService _doctorService;
         private readonly IPatientService _patientService;
         private readonly IAppointmentService _appointmentService; // later
-        
+
         private enum MenuOption
         {
             ViewDoctors = 1,
@@ -20,12 +22,36 @@ namespace MyDoctorAppointment
             Exit
         }
 
-        public DoctorAppointment()
+        public DoctorAppointment(string appSettings, ISerializationService serializationService)
         {
+            _appSettings = appSettings;
             _doctorService = new DoctorService();
             _patientService = new PatientService();
             _appointmentService = new AppointmentService();
         }
+
+        public static DoctorAppointment StorageType()
+        {
+            Console.WriteLine("Choose storage type: 1-xml, 2-json");
+            int storageChoice = int.Parse(Console.ReadLine()!);
+
+            switch (storageChoice)
+            {
+                case 1:
+                    doctorAppointment = new DoctorAppointment(Constants.XmlSettingsPath, new XmlSerializerService());
+                    break;
+                case 2:
+                    doctorAppointment = new DoctorAppointment(Constants.AppSettingsPath, new JsonSerializerService());
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice, defaulting to JSON.");
+                    doctorAppointment = new DoctorAppointment(Constants.AppSettingsPath, new JsonSerializerService());
+                    break;
+            }
+
+            return doctorAppointment;
+        }
+
 
         public void Menu()
         {
@@ -34,13 +60,13 @@ namespace MyDoctorAppointment
             while (isRunning)
             {
                 Console.Clear();
-                Console.WriteLine("=== Меню запису до лікаря ===");
-                Console.WriteLine("1. Переглянути список лікарів");
-                Console.WriteLine("2. Додати лікаря");
-                Console.WriteLine("3. Переглянути список пацієнтів");
-                Console.WriteLine("4. Додати пацієнта");
-                Console.WriteLine("5. Вийти");
-                Console.Write("Оберіть опцію: ");
+                Console.WriteLine("=== Menu ===");
+                Console.WriteLine("1. Check doctor list");
+                Console.WriteLine("2. Add doctor");
+                Console.WriteLine("3. Check patient list");
+                Console.WriteLine("4. Add patient");
+                Console.WriteLine("5. Exit");
+                Console.Write("Your choice: ");
 
                 int choice = int.Parse(Console.ReadLine()!);
                 MenuOption option = (MenuOption)choice;
@@ -60,14 +86,14 @@ namespace MyDoctorAppointment
                         AddPatient();
                         break;
                     case MenuOption.Exit:
-                        Console.WriteLine("Завершення роботи...");
+                        Console.WriteLine("Successful exit...");
                         isRunning = false;
                         break;
                 }
 
                 if (isRunning)
                 {
-                    Console.WriteLine("\nНатисніть будь-яку клавішу для продовження...");
+                    Console.WriteLine("\nPress any key...");
                     Console.ReadKey();
                 }
             }
@@ -75,33 +101,39 @@ namespace MyDoctorAppointment
 
         private void ViewDoctors()
         {
-            Console.WriteLine("\n=== Список лікарів ===");
+            Console.WriteLine("\n=== Doctor List ===");
             var doctors = _doctorService.GetAll();
             foreach (var doc in doctors)
             {
-                Console.WriteLine($"{doc.Name} {doc.Surname} - {doc.DoctorType}, Досвід: {doc.Experience} років");
+                Console.WriteLine($"{doc.Name} {doc.Surname} - {doc.DoctorType}, Exp: {doc.Experience} years");
             }
         }
 
         private void AddDoctor()
         {
-            Console.WriteLine("\n=== Додавання нового лікаря ===");
+            Console.WriteLine("\n=== Add Doctor ===");
 
-            Console.Write("Ім'я: ");
+            Console.Write("Name: ");
             string name = Console.ReadLine()!;
 
-            Console.Write("Прізвище: ");
+            Console.Write("Surname: ");
             string surname = Console.ReadLine()!;
 
-            Console.Write("Досвід (років): ");
+            Console.Write("Experience year: ");
             byte experience = byte.Parse(Console.ReadLine()!);
 
-            Console.WriteLine("Оберіть тип лікаря:");
+            Console.Write("Email: ");
+            string email = Console.ReadLine()!;
+
+            Console.Write("Phone: ");
+            string phone = Console.ReadLine()!;
+
+            Console.WriteLine("Choose doctor type:");
             foreach (var type in Enum.GetValues(typeof(Domain.Enums.DoctorTypes)))
             {
                 Console.WriteLine($"{(int)type}. {type}");
             }
-
+            Console.Write("Your choice:");
             int doctorType = int.Parse(Console.ReadLine()!);
 
             var newDoctor = new Doctor
@@ -113,12 +145,12 @@ namespace MyDoctorAppointment
             };
 
             _doctorService.Create(newDoctor);
-            Console.WriteLine("Лікар успішно доданий!");
+            Console.WriteLine("Doctor is created successfully!");
         }
 
         private void ViewPatients()
         {
-            Console.WriteLine("\n=== Список пацієнтів ===");
+            Console.WriteLine("\n=== Patient List ===");
             var patients = _patientService.GetAll();
 
             foreach (var patient in patients)
@@ -129,13 +161,26 @@ namespace MyDoctorAppointment
 
         private void AddPatient()
         {
-            Console.WriteLine("\n=== Додавання нового пацієнта ===");
+            Console.WriteLine("\n=== Add patient ===");
 
-            Console.Write("Ім'я: ");
+            Console.Write("Name: ");
             string name = Console.ReadLine()!;
 
-            Console.Write("Прізвище: ");
+            Console.Write("Surname: ");
             string surname = Console.ReadLine()!;
+
+            Console.Write("Email: ");
+            string email = Console.ReadLine()!;
+
+            Console.Write("Phone: ");
+            string phone = Console.ReadLine()!;
+
+            Console.Write("Illness type: ");
+            foreach (var type in Enum.GetValues(typeof(Domain.Enums.IllnessTypes)))
+            {
+                Console.WriteLine($"{(int)type}. {type}");
+            }
+            string illnessType = Console.ReadLine()!;
 
             var newPatient = new Patient
             {
@@ -144,7 +189,7 @@ namespace MyDoctorAppointment
             };
 
             _patientService.Create(newPatient);
-            Console.WriteLine("Пацієнт успішно доданий!");
+            Console.WriteLine("Patient is created successfully!");
         }
     }
 
@@ -152,8 +197,9 @@ namespace MyDoctorAppointment
     {
         public static void Main()
         {
-            var doctorAppointment = new DoctorAppointment();
+            var doctorAppointment = DoctorAppointment.StorageType();
+            
             doctorAppointment.Menu();
         }
     }
-}
+

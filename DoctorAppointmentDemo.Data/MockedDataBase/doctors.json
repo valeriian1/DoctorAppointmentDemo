@@ -1,0 +1,14 @@
+[
+  {
+    "DoctorType": 2,
+    "Experience": 0,
+    "Salary": 0.0,
+    "Name": "Valeriia Nazarenko",
+    "Surname": "oops",
+    "Phone": null,
+    "Email": null,
+    "Id": 4,
+    "CreatedAt": "2025-03-29T18:17:52.018218+02:00",
+    "UpdatedAt": "0001-01-01T00:00:00"
+  }
+]

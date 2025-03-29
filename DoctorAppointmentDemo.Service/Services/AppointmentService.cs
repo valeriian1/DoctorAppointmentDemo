@@ -1,17 +1,19 @@
-﻿using MyDoctorAppointment.Data.Interfaces;
-using MyDoctorAppointment.Data.Repositories;
-using MyDoctorAppointment.Domain.Entities;
-using MyDoctorAppointment.Service.Interfaces;
+﻿using DoctorAppointmentDemo.Data.Interfaces;
+using DoctorAppointmentDemo.Data.Repositories;
+using DoctorAppointmentDemo.Domain.Entities;
+using DoctorAppointmentDemo.Service.Interfaces;
 
-namespace MyDoctorAppointment.Service.Services
+namespace DoctorAppointmentDemo.Service.Services
 {
     public class AppointmentService : IAppointmentService
     {
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly string appSettings;
+        private readonly ISerializationService serializationService;
 
         public AppointmentService()
         {
-            _appointmentRepository = new AppointmentRepository();
+            _appointmentRepository = new AppointmentRepository(appSettings, serializationService);
         }
 
         public Appointment Create(Appointment appointment)

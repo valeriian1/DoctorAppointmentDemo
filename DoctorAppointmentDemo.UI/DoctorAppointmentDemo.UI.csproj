@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DoctorAppointmentDemo.Data\DoctorAppointmentDemo.Data.csproj" />
     <ProjectReference Include="..\DoctorAppointmentDemo.Service\DoctorAppointmentDemo.Service.csproj" />
   </ItemGroup>
 
